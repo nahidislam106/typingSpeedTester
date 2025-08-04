@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Typing Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .results { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .metric { font-size: 24px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Typing Results</h1>
+    <div class="results">
+        <div class="metric">Speed: <strong>{{ wpm }} WPM</strong></div>
+        <div class="metric">Accuracy: <strong>{{ accuracy }}%</strong></div>
+        <div class="metric">Correct characters: <strong>{{ correct_chars }}/{{ total_chars }}</strong></div>
+    </div>
+    <a href="{% url 'typing-test' %}">Try again</a>
+</body>
+</html>

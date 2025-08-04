@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Typing Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #text-display { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        #text-input { width: 100%; height: 150px; padding: 10px; font-size: 16px; }
+        #timer { font-size: 24px; font-weight: bold; }
+        .correct { color: green; }
+        .incorrect { color: red; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Typing Test</h1>
+    <div id="timer">00:00</div>
+    <div id="text-display">{{ sample_text }}</div>
+    <textarea id="text-input" placeholder="Start typing here..."></textarea>
+    
+    <form id="results-form" method="post" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="text" id="hidden-text">
+        <input type="hidden" name="typed_text" id="hidden-typed-text">
+        <input type="hidden" name="time_taken" id="hidden-time-taken">
+    </form>
+    
+    <script>
+        const textDisplay = document.getElementById('text-display');
+        const textInput = document.getElementById('text-input');
+        const timerDisplay = document.getElementById('timer');
+        const hiddenText = document.getElementById('hidden-text');
+        const hiddenTypedText = document.getElementById('hidden-typed-text');
+        const hiddenTimeTaken = document.getElementById('hidden-time-taken');
+        const form = document.getElementById('results-form');
+        
+        const originalText = "{{ sample_text }}";
+        hiddenText.value = originalText;
+        
+        let startTime;
+        let timerInterval;
+        
+        textInput.addEventListener('focus', () => {
+            if (!startTime) {
+                startTime = new Date();
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+        });
+        
+        textInput.addEventListener('input', () => {
+            const typedText = textInput.value;
+            hiddenTypedText.value = typedText;
+            
+            let displayHTML = '';
+            for (let i = 0; i < originalText.length; i++) {
+                if (i < typedText.length) {
+                    if (typedText[i] === originalText[i]) {
+                        displayHTML += `<span class="correct">${originalText[i]}</span>`;
+                    } else {
+                        displayHTML += `<span class="incorrect">${originalText[i]}</span>`;
+                    }
+                } else {
+                    displayHTML += originalText[i];
+                }
+            }
+            
+            textDisplay.innerHTML = displayHTML;
+            
+            // Submit when complete
+            if (typedText.length === originalText.length) {
+                const endTime = new Date();
+                const timeTaken = (endTime - startTime) / 1000;
+                hiddenTimeTaken.value = timeTaken;
+                clearInterval(timerInterval);
+                form.submit();
+            }
+        });
+        
+        function updateTimer() {
+            const currentTime = new Date();
+            const elapsed = new Date(currentTime - startTime);
+            const minutes = String(elapsed.getMinutes()).padStart(2, '0');
+            const seconds = String(elapsed.getSeconds()).padStart(2, '0');
+            timerDisplay.textContent = `${minutes}:${seconds}`;
+        }
+    </script>
+</body>
+</html>
